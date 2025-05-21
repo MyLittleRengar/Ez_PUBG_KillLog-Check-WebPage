@@ -1,6 +1,6 @@
 # PUBG 킬로그 카운터
 
-![PUBG Banner](https://pubg.wiki.gg/images/thumb/6/6d/M416_icon.png/120px-M416_icon.png)
+![PUBG Banner](https://wstatic-prod.pubg.com/web/live/release_6ad83ea/img/1de035e.webp)
 
 ## 소개
 

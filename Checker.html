@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>배틀그라운드 킬로그 체크툴</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      max-width: 1400px;
+      margin: 20px auto;
+      padding: 0 15px;
+      background: #f5f5f5;
+    }
+    .menu-bar {
+      position: fixed;
+      top: 10px;
+      right: 10px;
+      z-index: 1000;
+      display: flex;
+      gap: 5px;
+    }
+    .tab-btn {
+      padding: 8px 15px;
+      border: none;
+      border-radius: 5px;
+      background: #3498db;
+      color: white;
+      cursor: pointer;
+      transition: 0.3s;
+      font-size: 1em;
+    }
+    .tab-btn.active {
+      background: #2980b9;
+    }
+    .content-section {
+      display: none;
+    }
+    .content-section.active {
+      display: block;
+    }
+
+    /* 킬로그 카운팅 스타일 */
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 25px;
+    }
+    #remaining-players {
+      text-align: center;
+      font-size: 1.2em;
+      font-weight: bold;
+      color: #2c3e50;
+      margin-bottom: 20px;
+      padding: 10px;
+      background: #ecf0f1;
+      border-radius: 5px;
+    }
+    #teams-container {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      grid-template-rows: repeat(2, auto);
+      gap: 14px;
+    }
+    .team-box {
+      background: white;
+      border-radius: 10px;
+      padding: 12px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .team-title {
+      font-size: 0.95em;
+      font-weight: 700;
+      color: #34495e;
+      margin-bottom: 8px;
+      text-align: center;
+    }
+    .player-labels {
+      display: flex;
+      flex-direction: row;
+      width: 100%;
+      justify-content: space-between;
+      margin-bottom: 6px;
+      font-size: 0.85em;
+      color: #888;
+      font-weight: 600;
+      letter-spacing: 1px;
+    }
+    .players {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      width: 100%;
+    }
+    .player-btn {
+      width: 100%;
+      padding: 8px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      background: #27ae60;
+      color: white;
+      font-size: 0.92em;
+      margin: 0;
+      transition: all 0.2s;
+    }
+    .player-btn.dead {
+      background: #e74c3c;
+      text-decoration: line-through;
+    }
+
+    /* 반응형 */
+    @media (max-width: 1200px) {
+      #teams-container { grid-template-columns: repeat(6, 1fr); }
+    }
+    @media (max-width: 900px) {
+      #teams-container { grid-template-columns: repeat(4, 1fr); }
+    }
+    @media (max-width: 600px) {
+      #teams-container { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 400px) {
+      #teams-container { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- 킬로그 카운팅 섹션 -->
+  <div id="kill-counter" class="content-section active">
+    <h1>배틀그라운드 경쟁전 사망자 트래커</h1>
+    <div id="remaining-players"></div>
+    <div id="teams-container"></div>
+  </div>
+
+  <script>
+
+    // ----------------- 킬로그 카운팅 -----------------
+    const teamsContainer = document.getElementById('teams-container');
+    const remainingPlayersEl = document.getElementById('remaining-players');
+
+    // 초기 데이터 생성
+    let teams = Array.from({length: 16}, (_, teamIndex) => ({
+      id: teamIndex + 1,
+      players: Array.from({length: 4}, (_, playerIndex) => ({
+        id: `${teamIndex+1}-${playerIndex+1}`,
+        name: `플레이어 ${playerIndex+1}`,
+        isDead: false
+      }))
+    }));
+
+    // 남은 플레이어 계산
+    function updateRemaining() {
+      const alive = teams.flatMap(t => t.players)
+        .filter(p => !p.isDead).length;
+      remainingPlayersEl.textContent = `남은 플레이어: ${alive}/64`;
+    }
+
+    // UI 렌더링
+    function renderTeams() {
+      teamsContainer.innerHTML = '';
+      teams.forEach(team => {
+        const teamDiv = document.createElement('div');
+        teamDiv.className = 'team-box';
+        teamDiv.innerHTML = `
+          <div class="team-title">팀 ${team.id}</div>
+          <div class="players">
+            ${team.players.map(player => `
+              <button 
+                class="player-btn ${player.isDead ? 'dead' : ''}" 
+                style="order:${player.id.split('-')[1]}"
+                onclick="togglePlayer(${team.id}, '${player.id}')"
+              >
+                ${player.name}
+              </button>
+            `).join('')}
+          </div>
+        `;
+        teamsContainer.appendChild(teamDiv);
+      });
+    }
+
+    // ----------------- 초기 실행 -----------------
+    renderTeams();
+    updateRemaining();
+  </script>
+</body>
+</html>
